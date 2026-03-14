@@ -3,3 +3,6 @@ numpy
 requests
 python-dotenv
 jupyter
+webdriver-manager
+selenium
+beautifulsoup4
