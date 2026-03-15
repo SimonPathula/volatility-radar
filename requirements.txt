@@ -6,3 +6,4 @@ jupyter
 webdriver-manager
 selenium
 beautifulsoup4
+undetected-chromedriver

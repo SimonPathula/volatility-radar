@@ -1,8 +1,10 @@
-from zipfile._path.glob import separate
+from random import random
 import time
+import random
 import pandas as pd
 from bs4 import BeautifulSoup
-from selenium import webdriver
+from datetime import datetime, timedelta
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -19,15 +21,15 @@ def weekly_data_scraped(date):
     driver.get(url)
 
     #wait for the webpage to load up
-    wait = WebDriverWait(driver, 15)
+    wait = WebDriverWait(driver, 30)
     wait.until(EC.presence_of_element_located((By.CLASS_NAME, "calendar__row")))
 
     # scroll slowly in steps
-    for i in range(1, 10):
-        driver.execute_script(f"window.scrollTo(0, {i * 500});")
-        time.sleep(0.5)
+    for i in range(1, 20):
+        driver.execute_script(f"window.scrollTo(0, {i * 250});")
+        time.sleep(0.3)
 
-    time.sleep(2)
+    time.sleep(1)
 
     page_source = driver.page_source
 
@@ -61,21 +63,61 @@ def weekly_data_scraped(date):
                 if not actual_text and not forecast_text and not previous_text:
                     continue
 
+                impact_cell = row.find('td', class_='calendar__impact')
+                if impact_cell:
+                    img = impact_cell.find('img')
+                    if img:
+                        src = img.get('src', '')
+                        if 'gra' in src:
+                            impact_text = 'Non-Economic'
+                        elif 'yel' in src:
+                            impact_text = 'Low'
+                        elif 'ora' in src:
+                            impact_text = 'Medium'
+                        elif 'red' in src:
+                            impact_text = 'High'
+                        else:
+                            impact_text = ''
+                    else:
+                        impact_text = ''
+                else:
+                    impact_text = ''
+
                 result.append({
                     'date': current_date,
                     'time': time_cell.get_text(strip= True) if time_cell else '',
                     'currency': currency,
                     'event': event.get_text(strip= True) if event else '',
+                    'impact': impact_text,
                     'actual': actual_text,
                     'forecast': forecast_text,
                     'previous': previous_text
                 })
     return result
 
+def weeks_from_then_tonow(year, month, date):
+    start_date = datetime(year, month, date)
+    end_date = datetime.today()
+
+    while start_date <= end_date:
+        try:
+            weekly_data_scraped(start_date.strftime("%b%#d.%Y").lower())
+            print(f"Scraping the week: {start_date.strftime('%b%#d.%Y').lower()}")
+        except Exception as e:
+            print(f"Failed: {start_date.strftime('%b%#d.%Y').lower()} — {e}")
+
+
+        # after every week, save what you have so far
+        pd.DataFrame(result).to_csv("data/raw/economic_calendar_raw.csv", index=False)
+        start_date += timedelta(days= 7)
+        time.sleep(random.uniform(4, 6))
+
+    return result
 
 if __name__ == '__main__':
-    driver = webdriver.Chrome()
-    data = weekly_data_scraped("jan3.2021")
+
+    driver = uc.Chrome()
+    data = weeks_from_then_tonow(2021, 1, 3)
     driver.quit()
 
     for row in data[:5]:
