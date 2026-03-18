@@ -7,3 +7,6 @@ webdriver-manager
 selenium
 beautifulsoup4
 undetected-chromedriver
+matplotlib
+seaborn
+
