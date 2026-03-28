@@ -10,6 +10,8 @@ def build_currency_features(pair):
 
     df['timestamp'] = pd.to_datetime(df['timestamp'])
 
+    df = df.rename(columns= {'timestamp' : 'date'})
+
     df['pair'] = pair
 
     col = 'pair'
@@ -25,7 +27,40 @@ def build_currency_features(pair):
 
     df['rolling_std'] = df['daily_return'].rolling(20, min_periods = 10).std()
 
-    df = df.dropna(subset= ['rolling_std'])
+
+    df['next_return'] = df.groupby('pair')['close'].shift(-1) - df.groupby('pair')['open'].shift(-1)
+
+    df['next_return'] = df['next_return'] / df.groupby('pair')['open'].shift(-1) * 100
+
+    def assign_label(row):
+        if pd.isna(row['next_return']) or pd.isna(row['rolling_std']):
+            return np.nan
+        
+        move = row['next_return']
+        
+        t1 = 0.35 * row['rolling_std']  # medium threshold
+        t2 = 0.75 * row['rolling_std']  # strong threshold
+        t3 = 1.25 * row['rolling_std']  # very strong threshold
+        
+        if move > t3:
+            return 6   # very strong up
+        elif move > t2:
+            return 5   # strong up
+        elif move > t1:
+            return 4   # medium up
+        elif move < -t3:
+            return 0   # very strong down
+        elif move < -t2:
+            return 1   # strong down
+        elif move < -t1:
+            return 2   # medium down
+        else:
+            return 3   # no move
+    
+    df['label'] = df.apply(assign_label, axis=1)
+
+    df = df.dropna(subset= ['rolling_std', 'label'])
+    df.drop(columns= ['next_return'], inplace= True)
 
     return df
 
