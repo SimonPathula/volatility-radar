@@ -10,3 +10,5 @@ undetected-chromedriver
 matplotlib
 seaborn
 scikit-learn
+xgboost
+optuna

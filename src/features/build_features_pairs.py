@@ -49,25 +49,39 @@ def build_currency_features(pair):
             return np.nan
         
         move = row['next_return']
-        
-        t1 = 0.35 * row['rolling_std_20']  # medium threshold
-        t2 = 0.75 * row['rolling_std_20']  # strong threshold
-        t3 = 1.25 * row['rolling_std_20']  # very strong threshold
-        
-        if move > t3:
-            return 6   # very strong up
-        elif move > t2:
-            return 5   # strong up
-        elif move > t1:
-            return 4   # medium up
-        elif move < -t3:
-            return 0   # very strong down
-        elif move < -t2:
-            return 1   # strong down
+        t1 = 0.35 * row['rolling_std_20']
+
+        if move > t1:
+            return 2   # bullish
         elif move < -t1:
-            return 2   # medium down
+            return 0   # bearish
         else:
-            return 3   # no move
+            return 1   # neutral
+
+    # def assign_label(row):
+    #     if pd.isna(row['next_return']) or pd.isna(row['rolling_std_20']) or pd.isna(row['rolling_std_5']) or pd.isna(row['rolling_std_10']):
+    #         return np.nan
+        
+    #     move = row['next_return']
+        
+    #     t1 = 0.35 * row['rolling_std_20']  # medium threshold
+    #     t2 = 0.75 * row['rolling_std_20']  # strong threshold
+    #     t3 = 1.25 * row['rolling_std_20']  # very strong threshold
+        
+    #     if move > t3:
+    #         return 6   # very strong up
+    #     elif move > t2:
+    #         return 5   # strong up
+    #     elif move > t1:
+    #         return 4   # medium up
+    #     elif move < -t3:
+    #         return 0   # very strong down
+    #     elif move < -t2:
+    #         return 1   # strong down
+    #     elif move < -t1:
+    #         return 2   # medium down
+    #     else:
+    #         return 3   # no move
     
     df['label'] = df.apply(assign_label, axis=1)
 
