@@ -42,4 +42,8 @@ cal_cols = ['high_impact_count', 'medium_impact_count', 'low_impact_count',
 
 df[cal_cols] = df[cal_cols].fillna(0)
 
+col = 'label'
+
+df = df[[c for c in df.columns if c != col] + [col]]
+
 df.to_csv("data/processed_v2/merged.csv", index= False)
