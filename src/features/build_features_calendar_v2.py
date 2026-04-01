@@ -75,13 +75,13 @@ def build_calendar_features(pair):
     df['change_rel'] = df['change_rel'].replace([np.inf, -np.inf], 0)
     df['change_rel'] = df['change_rel'].fillna(0)
 
-    df['z_score'] = df.groupby('event')['change_rel'].transform(lambda x: (x - x.mean()) / x.std())
-    df['z_score'] = df['z_score'].fillna(0)
+    # df['z_score'] = df.groupby('event')['change_rel'].transform(lambda x: (x - x.mean()) / x.std())
+    # df['z_score'] = df['z_score'].fillna(0)
 
     impact_map = {'Low':1, 'Medium':2, 'High':3}
     df['impact_num'] = df['impact'].map(impact_map)
 
-    df['signal'] = df['z_score'] * df['impact_num']
+    # df['signal'] = df['z_score'] * df['impact_num']
 
     return df
 
@@ -89,7 +89,23 @@ pairs = ['eurusd', 'gbpusd', 'usdjpy']
 
 dfs = [build_calendar_features(i) for i in pairs]
 
-calendar_features = pd.concat(dfs).reset_index(drop= True)
-calendar_features.drop_duplicates().reset_index(drop = True)
+calendar_features = pd.concat(dfs, ignore_index=True)
 
-calendar_features.to_csv('data/processed_v2/calendar_features.csv', index= False)
+calendar_features['z_score'] = (
+    calendar_features.groupby('event')['change_rel']
+    .transform(lambda x: (x - x.mean()) / (x.std() + 1e-6))
+    .fillna(0)
+)
+
+calendar_features['surprise_z'] = (
+    calendar_features.groupby(['event', 'currency'])['change_rel']
+    .transform(lambda x: (x - x.mean()) / (x.std() + 1e-6))
+    .fillna(0)
+)
+
+calendar_features['signal'] = calendar_features['z_score'] * calendar_features['impact_num']
+calendar_features['signal_surprise'] = calendar_features['surprise_z'] * calendar_features['impact_num']
+
+calendar_features = calendar_features.drop_duplicates().reset_index(drop=True)
+
+calendar_features.to_csv('data/processed_v2/calendar_features.csv', index=False)
