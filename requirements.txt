@@ -14,3 +14,8 @@ xgboost
 optuna
 shap
 openai
+pymysql
+sqlalchemy
+fastapi
+uvicorn
+pydantic

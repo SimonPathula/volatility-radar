@@ -12,7 +12,7 @@ def build_currency_features(pair):
 
     df = df.rename(columns= {'timestamp' : 'date'})
 
-    df['pair'] = pair
+    df['pair'] = pair 
 
     col = 'pair'
 
