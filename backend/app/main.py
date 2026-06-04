@@ -1,6 +1,7 @@
 import joblib
 from fastapi import FastAPI
 from pydantic import BaseModel
+from app.services.prediction_service import predict_pair
 
 app = FastAPI(
     title = "Volatility Radar"
@@ -8,6 +9,7 @@ app = FastAPI(
 
 class PredictionRequest(BaseModel):
     pair: str
+    date: str
 
 model = joblib.load(r"D:\projects\volatility-radar\src\models\volatility_radar_xgb.pkl")
 
@@ -21,11 +23,8 @@ def health():
 
 @app.get("/pairs")
 def get_pairs():
-    return ["EURUSD", "GBPUSD", "USDJPY"] 
+    return ["EURUSD", "GBPUSD", "USDJPY"]
 
 @app.post("/predict")
 def predict(request: PredictionRequest):
-    return {
-        "pair" : request.pair,
-        "message" : "Model loaded successfully"
-    }
+    return predict_pair(request.pair, request.date)

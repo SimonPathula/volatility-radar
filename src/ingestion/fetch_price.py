@@ -21,10 +21,10 @@ def fetch_forex_daily(from_symbol, to_symbol, start_date, end_date):
 
     print(f"{from_symbol}{to_symbol}: {df.shape}")
 
-    df.to_csv(f"data/raw/{from_symbol}{to_symbol}_daily.csv")
+    df.to_csv(f"database/raw/{from_symbol}{to_symbol}_daily.csv")
 
 
-fetch_forex_daily("EUR", "USD", "2021-01-01", "2026-03-13")
-fetch_forex_daily("USD", "JPY", "2021-01-01", "2026-03-13")
-fetch_forex_daily("GBP", "USD", "2021-01-01", "2026-03-13")
+fetch_forex_daily("EUR", "USD", "2026-03-13", "2026-06-02")
+fetch_forex_daily("USD", "JPY", "2026-03-13", "2026-06-02")
+fetch_forex_daily("GBP", "USD", "2026-03-13", "2026-06-02")
     

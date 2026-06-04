@@ -4,9 +4,11 @@ import pandas as pd
 
 def build_price_features(df):
 
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    if 'timestamp' in df.columns:
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df = df.rename(columns={'timestamp': 'date'})
 
-    df = df.rename(columns= {'timestamp' : 'date'})
+    df['date'] = pd.to_datetime(df['date'])
 
     df['date'] = pd.to_datetime(df['date'])
     df['day_of_week'] = df['date'].dt.dayofweek
@@ -153,7 +155,7 @@ def create_calendar_signals(df):
 
 def aggregate_calendar_features(cal_df):
 
-    cal_agg = cal_df.groupby(['date', 'pair']).agg(
+    cal_agg = cal_df.groupby(['date']).agg(
         high_impact_count=('impact_num', lambda x: (x == 3).sum()),
         medium_impact_count=('impact_num', lambda x: (x == 2).sum()),
         low_impact_count=('impact_num', lambda x: (x == 1).sum()),
@@ -171,7 +173,7 @@ def merge_features(price_df, cal_df):
 
     df = price_df.merge(
         cal_agg,
-        on=['date', 'pair'],
+        on=['date'],
         how='left'
     )
 
@@ -191,4 +193,5 @@ def merge_features(price_df, cal_df):
     return df
 
 def generate_feature_vector(merge_df):
+    pass
     

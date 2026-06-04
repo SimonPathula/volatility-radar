@@ -6,9 +6,9 @@ from app.db.database import engine
 
 
 PRICE_FILES = [
-    ("D:/projects/volatility-radar/data/raw/EURUSD_daily.csv", "EURUSD"),
-    ("D:/projects/volatility-radar/data/raw/GBPUSD_daily.csv", "GBPUSD"),
-    ("D:/projects/volatility-radar/data/raw/USDJPY_daily.csv", "USDJPY"),
+    (r"D:\projects\volatility-radar\database\processed\EURUSD_daily.csv", "EURUSD"),
+    (r"D:\projects\volatility-radar\database\processed\GBPUSD_daily.csv", "GBPUSD"),
+    (r"D:\projects\volatility-radar\database\processed\USDJPY_daily.csv", "USDJPY"),
 ]
 
 
@@ -56,7 +56,7 @@ def load_calendar():
     with engine.begin() as conn:
         conn.execute(text("TRUNCATE TABLE calendar_events"))
 
-    df = pd.read_csv("D:/projects/volatility-radar/data/raw/economic_calendar_raw.csv")
+    df = pd.read_csv(r"D:\projects\volatility-radar\database\processed\economic_calendar_clean.csv")
 
     df["date"] = pd.to_datetime(
         df["date"],
@@ -77,8 +77,7 @@ def load_calendar():
             "event",
             "impact",
             "actual",
-            "forecast",
-            "previous",
+            "previous"
         ]
     ]
 

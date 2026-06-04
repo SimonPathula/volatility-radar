@@ -19,3 +19,7 @@ dependencies = [
     "webdriver-manager>=4.0.2",
     "yfinance>=1.2.0",
 ]
+
+[tool.pyrefly]
+project-includes = ["backend"]
+search-path = ["backend"]

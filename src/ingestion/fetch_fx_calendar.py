@@ -1,3 +1,4 @@
+from distro import version
 from random import random
 import time
 import random
@@ -108,7 +109,7 @@ def weeks_from_then_tonow(year, month, date):
 
 
         # after every week, save what you have so far
-        pd.DataFrame(result).to_csv("data/raw/economic_calendar_raw.csv", index=False)
+        pd.DataFrame(result).to_csv("database/raw/economic_calendar_raw.csv", index=False)
         start_date += timedelta(days= 7)
         time.sleep(random.uniform(4, 6))
 
@@ -116,8 +117,8 @@ def weeks_from_then_tonow(year, month, date):
 
 if __name__ == '__main__':
 
-    driver = uc.Chrome()
-    data = weeks_from_then_tonow(2021, 1, 3)
+    driver = uc.Chrome(version_main = 148)
+    data = weeks_from_then_tonow(2026, 3, 8)
     driver.quit()
 
     for row in data[:5]:
