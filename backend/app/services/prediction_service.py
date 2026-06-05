@@ -3,7 +3,9 @@ import pandas as pd
 from datetime import timedelta
 from app.db.database import engine
 from fastapi import HTTPException
-from app.services.feature_pipeline import build_price_features, build_calendar_features, create_calendar_signals,aggregate_calendar_features, merge_features
+from app.services.feature_pipeline import build_price_features, build_calendar_features, create_calendar_signals, merge_features
+from app.services.prediction_core import build_prediction_features
+from app.services.shap_explaination import get_top_shap_features
 
 MODEL = joblib.load(r"D:\projects\volatility-radar\src\models\volatility_radar_xgb.pkl")
 
@@ -72,67 +74,23 @@ def get_actual_label(pair: str, date: str):
         return "Neutral"
         
 def predict_pair_past(pair:str, date:str):
-    dt = pd.to_datetime(date)
-
-    price_query = f'''
-    SELECT *
-    FROM forex_prices
-    WHERE pair = "{pair}" AND `date` < '{dt}'
-    ORDER BY `date` DESC
-    LIMIT 30
-    '''
-
-    pair_1 = pair[:3]
-    pair_2 = pair[3:]
-
-    cal_query = f"""
-    SELECT *
-    FROM calendar_events
-    WHERE currency IN ('{pair_1}','{pair_2}')
-    AND `date` < '{dt}'
-    ORDER BY `date` DESC
-    """
-
-    price_df = pd.read_sql(price_query, engine)
-    price_df = price_df.sort_values("date")
-
-    cal_df = pd.read_sql(cal_query, engine)
-    cal_df = cal_df.sort_values("date")
-
-    price_df = build_price_features(price_df)
-    cal_df = build_calendar_features(cal_df)
-    cal_df = create_calendar_signals(cal_df)
-    merged = merge_features(price_df, cal_df)
-
-    def generate_vector(df):
-        return df.tail(1)
-
-    df = generate_vector(merged)
-
-    if df.empty:
-        raise HTTPException(
-            status_code=400,
-            detail="Not enough historical data available."
-        )
+    df = build_prediction_features(pair, date)
 
     feature_names = MODEL.feature_names_in_
-
-    pair_map = {
-        'EURUSD': 0,
-        'GBPUSD': 1,
-        'USDJPY': 2
-    }
-
-    df['pair'] = df['pair'].map(pair_map)
 
     X = df[feature_names]
 
     prediction = MODEL.predict(X)[0]
     probabilities = MODEL.predict_proba(X)[0]
 
+    top_features = get_top_shap_features(
+    X,
+    prediction
+    )
+
     actual = get_actual_label(pair, date)
 
-    label_map = {
+    LABEL_MAP = {
         0: "Bearish",
         1: "Neutral",
         2: "Bullish"
@@ -141,17 +99,18 @@ def predict_pair_past(pair:str, date:str):
     return {
     "pair": pair,
     "date": date,
-    "prediction": label_map[prediction],
+    "prediction": LABEL_MAP[prediction],
     "actual": actual,
     "correct": (
-        actual == label_map[prediction]
+        actual == LABEL_MAP[prediction]
         if actual is not None
         else None
     ),
     "confidence": float(probabilities.max()),
     "bearish_probability": float(probabilities[0]),
     "neutral_probability": float(probabilities[1]),
-    "bullish_probability": float(probabilities[2])
+    "bullish_probability": float(probabilities[2]),
+    "top_drivers" : top_features
     }
 
 def predict_pair_future(pair:str, date:str):
@@ -160,77 +119,41 @@ def predict_pair_future(pair:str, date:str):
         engine
     ).iloc[0]["dt"]
 
-    price_query = f'''
-    SELECT *
-    FROM forex_prices
-    WHERE pair = '{pair}'
-    AND date <= '{latest_price_date}'
-    ORDER BY `date` DESC
-    LIMIT 30
-    '''
-    pair_1 = pair[:3]
-    pair_2 = pair[3:]
-
-    cal_query = f"""
-    SELECT *
-    FROM calendar_events
-    WHERE currency IN ('{pair_1}','{pair_2}')
-    AND `date` < '{latest_price_date}'
-    ORDER BY `date` DESC
-    """
-    price_df = pd.read_sql(price_query, engine)
-    price_df = price_df.sort_values("date")
-
-    cal_df = pd.read_sql(cal_query, engine)
-    cal_df = cal_df.sort_values("date")
-
-    price_df = build_price_features(price_df)
-    cal_df = build_calendar_features(cal_df)
-    cal_df = create_calendar_signals(cal_df)
-    merged = merge_features(price_df, cal_df)
-
-    if merged.empty:
-        raise ValueError(
-            f"No data available for {pair}"
-        )
-
-    def generate_vector(df):
-        return df.tail(1)
-
-    df = generate_vector(merged)
-
+    df = build_prediction_features(
+    pair,
+    latest_price_date + timedelta(days=1)
+    )
 
     feature_names = MODEL.feature_names_in_
-
-    pair_map = {
-        'EURUSD': 0,
-        'GBPUSD': 1,
-        'USDJPY': 2
-    }
-
-    df['pair'] = df['pair'].map(pair_map)
 
     X = df[feature_names]
 
     prediction = MODEL.predict(X)[0]
     probabilities = MODEL.predict_proba(X)[0]
 
-    label_map = {
+    top_features = get_top_shap_features(
+        X,
+        prediction
+    )
+
+    LABEL_MAP = {
         0: "Bearish",
         1: "Neutral",
         2: "Bullish"
     }
+
     return {
     "pair": pair,
     "prediction_for": str(
         pd.to_datetime(latest_price_date).date()
         + pd.Timedelta(days=1)
     ),
-    "prediction": label_map[prediction],
+    "prediction": LABEL_MAP[prediction],
     "confidence": float(probabilities.max()),
     "bearish_probability": float(probabilities[0]),
     "neutral_probability": float(probabilities[1]),
-    "bullish_probability": float(probabilities[2])
+    "bullish_probability": float(probabilities[2]),
+    "top drivers" : top_features
     }
 
 def predict_pair(pair:str, date:str):
