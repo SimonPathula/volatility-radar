@@ -3,7 +3,6 @@ import pandas as pd
 from datetime import timedelta
 from app.db.database import engine
 from fastapi import HTTPException
-from app.services.feature_pipeline import build_price_features, build_calendar_features, create_calendar_signals, merge_features
 from app.services.prediction_core import build_prediction_features
 from app.services.shap_explaination import get_top_shap_features
 
@@ -174,7 +173,7 @@ def predict_pair(pair:str, date:str):
         "SELECT MAX(date) AS dt FROM forex_prices",
         engine
     ).iloc[0]["dt"]
-
+ 
     latest_price_date = pd.to_datetime(
         latest_price_date
     ).date()

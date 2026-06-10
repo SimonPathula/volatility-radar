@@ -1,7 +1,11 @@
+from fastapi import HTTPException
 from dotenv import load_dotenv
 load_dotenv()
 import os
 import joblib
+import pandas as pd
+from datetime import timedelta
+from app.db.database import engine
 from app.services.prediction_core import build_prediction_features
 from app.services.shap_explaination import get_top_shap_features
 
@@ -91,3 +95,55 @@ def generate_explanation(pair, date):
     "prediction": LABEL_MAP[prediction],
     "explanation": explanation
     }
+
+def generate_explanation_for_pair(pair:str, date:str):
+    VALID_PAIRS = {
+        "EURUSD",
+        "GBPUSD",
+        "USDJPY"
+    }
+    
+    if pair not in VALID_PAIRS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported pair: {pair}"
+        )
+
+    requested_date = pd.to_datetime(date).date()
+    latest_price_date = pd.read_sql(
+        "SELECT MAX(date) AS dt FROM forex_prices",
+        engine
+    ).iloc[0]["dt"]
+ 
+    latest_price_date = pd.to_datetime(
+        latest_price_date
+    ).date()
+
+    if requested_date < latest_price_date:
+
+        if requested_date.weekday() >= 5:
+            raise HTTPException(
+            status_code=400,
+            detail="Forex market closed on weekends."
+        )
+
+        return generate_explanation(pair, date)
+
+    elif requested_date == latest_price_date + timedelta(days=1):
+
+        result = generate_explanation(pair, date)
+
+        if requested_date.weekday() >= 5:
+            result["warning"] = (
+                "Forex markets will be closed tomorrow. "
+                "Market reopen gaps and abnormal price "
+                "behavior may occur."
+            )
+
+        return result
+
+    else:
+        raise HTTPException(
+        status_code=400,
+        detail="Select a historical trading day or tomorrow."
+    )

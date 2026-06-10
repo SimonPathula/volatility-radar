@@ -1,9 +1,10 @@
+from app.services.gpt_explanation import generate_explanation_for_pair
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pandas as pd
 from app.services.prediction_service import predict_pair
-from app.services.gpt_explanation import generate_explanation
+from app.services.gpt_explanation import generate_explanation_for_pair
 from app.db.database import engine
 
 
@@ -45,7 +46,7 @@ async def predict(request: PredictionRequest):
 
 @app.post("/explain")
 async def explain(request: ExplanationRequest):
-    return generate_explanation(request.pair, request.date)
+    return generate_explanation_for_pair(request.pair, request.date)
 
 @app.get("/prices/{pair}")
 def get_prices(pair: str, days: int = 90):
