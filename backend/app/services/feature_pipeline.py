@@ -10,7 +10,6 @@ def build_price_features(df):
 
     df['date'] = pd.to_datetime(df['date'])
 
-    df['date'] = pd.to_datetime(df['date'])
     df['day_of_week'] = df['date'].dt.dayofweek
     df['month'] = df['date'].dt.month
     df['week_of_year'] = df['date'].dt.isocalendar().week.astype(int)

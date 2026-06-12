@@ -6,6 +6,7 @@ import pandas as pd
 from app.services.prediction_service import predict_pair
 from app.services.gpt_explanation import generate_explanation_for_pair
 from app.db.database import engine
+from app.services.get_ohlc_data import get_ohlc_data
 
 
 app = FastAPI(
@@ -47,6 +48,10 @@ async def predict(request: PredictionRequest):
 @app.post("/explain")
 async def explain(request: ExplanationRequest):
     return generate_explanation_for_pair(request.pair, request.date)
+
+@app.post("/ohlcdata")
+async def get_data(request: PredictionRequest):
+    return get_ohlc_data(request.pair, request.date)
 
 @app.get("/prices/{pair}")
 def get_prices(pair: str, days: int = 90):
