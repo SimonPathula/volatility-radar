@@ -59,3 +59,20 @@ body {
 .analytics-page {
     padding: 0;
 }
+
+@media (max-width: 768px) {
+    .dashboard {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .cards-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .cards-left  { order: 1; height: auto; }
+    .cards-center { order: 2; width: 100%; min-height: 300px; }
+    .cards-right  { order: 3; height: auto; }
+}

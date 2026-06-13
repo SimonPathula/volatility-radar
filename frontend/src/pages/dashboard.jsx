@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { predict, explain, getHistoricValidation, getEconomicEvents, getPriceHistory } from "../api/api"
 
 import PairSelector from "../components/PairSelector"
@@ -19,7 +19,6 @@ import "../styles/economic-events.css"
 import "../styles/price-chart.css"
 
 function Dashboard() {
-
     const [pair, setPair] = useState("EURUSD")
     const [date, setDate] = useState("")
     const [result, setResult] = useState(null)
@@ -32,6 +31,9 @@ function Dashboard() {
     const [validationLoading, setValidationLoading] = useState(false)
     const [events, setEvents] = useState(null)
     const [priceHistory, setPriceHistory] = useState(null)
+    const [chartDate, setChartDate] = useState(null)
+
+    const predictionRequestId = useRef(0)
 
     async function handlePrediction() {
         if (!date) {
@@ -39,37 +41,65 @@ function Dashboard() {
             return
         }
 
+        const requestId = predictionRequestId.current + 1
+        predictionRequestId.current = requestId
+
         setLoading(true)
         setValidationLoading(true)
         setError(null)
         setEvents(null)
         setValidation(null)
+        setResult(null)
+        setExplanation(null)
+        setShowExplanation(false)
 
-        // Prediction — awaited, needed before showing result
+        setPriceHistory(null)
+        setChartDate(null)
+
         try {
             const predData = await predict(pair, date)
+
+            if (requestId !== predictionRequestId.current) return
+
             setResult(predData)
+            setChartDate(date)
         } catch (err) {
+            if (requestId !== predictionRequestId.current) return
+
             setError(err.message)
             setLoading(false)
             setValidationLoading(false)
             return
         }
+
         setLoading(false)
 
-        // Validation & Events — fire independently, never block each other
         getHistoricValidation(pair, date)
-            .then(d => setValidation(d))
-            .catch(() => setValidation(null))
-            .finally(() => setValidationLoading(false))
+            .then(d => {
+                if (requestId === predictionRequestId.current) setValidation(d)
+            })
+            .catch(() => {
+                if (requestId === predictionRequestId.current) setValidation(null)
+            })
+            .finally(() => {
+                if (requestId === predictionRequestId.current) setValidationLoading(false)
+            })
 
         getEconomicEvents(pair, date)
-            .then(d => setEvents(d))
-            .catch(() => setEvents([]))
-        
+            .then(d => {
+                if (requestId === predictionRequestId.current) setEvents(d)
+            })
+            .catch(() => {
+                if (requestId === predictionRequestId.current) setEvents([])
+            })
+
         getPriceHistory(pair, date)
-            .then(d => setPriceHistory(d))
-            .catch(() => {})
+            .then(d => {
+                if (requestId === predictionRequestId.current) setPriceHistory(d)
+            })
+            .catch(() => {
+                if (requestId === predictionRequestId.current) setPriceHistory([])
+            })
     }
 
     async function handleExplain() {
@@ -77,10 +107,12 @@ function Dashboard() {
             setError("Please select a date first.")
             return
         }
+
         setExplaining(true)
         setShowExplanation(false)
         setExplanation(null)
         setError(null)
+
         try {
             const data = await explain(pair, date)
             setExplanation(data.explanation)
@@ -94,7 +126,6 @@ function Dashboard() {
 
     return (
         <main className="dashboard">
-
             <section className="control-panel-wrapper">
                 <div className="control-panel">
                     <PairSelector pair={pair} setPair={setPair} />
@@ -102,12 +133,14 @@ function Dashboard() {
                     <PredictionButton handlePrediction={handlePrediction} loading={loading} />
                     <ExplainButton onClick={handleExplain} loading={explaining} />
                 </div>
+
                 {error && (
                     <div className="error-strip">
                         <span>⚠</span>
                         <span>{error}</span>
                     </div>
                 )}
+
                 {showExplanation && (
                     <div className="explanation-strip">
                         <span className="explanation-strip-label">✦</span>
@@ -121,15 +154,22 @@ function Dashboard() {
             <div className="cards-grid">
                 <div className="cards-left">
                     <PredictionCard result={result} />
+
                     <HistoricalValidation
                         result={result}
                         validation={validation}
                         validationLoading={validationLoading}
                     />
                 </div>
+
                 <div className="cards-center">
-                    <PriceChart date={date} pair={pair} priceHistory={priceHistory} />
+                    <PriceChart
+                        date={chartDate}
+                        pair={pair}
+                        priceHistory={priceHistory}
+                    />
                 </div>
+
                 <div className="cards-right">
                     <TopDrivers drivers={result?.top_drivers} />
                     <EconomicEvents events={events} date={date} />
