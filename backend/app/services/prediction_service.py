@@ -16,7 +16,7 @@ def get_actual_label(pair: str, date: str):
         WHERE pair = '{pair}'
         AND date <= '{date}'
         ORDER BY date DESC
-        LIMIT 40
+        LIMIT 30
         """
 
         df = pd.read_sql(q, engine)

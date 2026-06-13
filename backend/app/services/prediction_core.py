@@ -33,7 +33,7 @@ def build_prediction_features(pair, cutoff_date):
     SELECT *
     FROM calendar_events
     WHERE currency IN ('{pair_1}','{pair_2}')
-    AND date < '{cutoff_date}'
+    AND date < '{cutoff_date}' 
     ORDER BY date DESC
     """
 

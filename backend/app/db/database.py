@@ -13,5 +13,7 @@ engine = create_engine(
     f"{os.getenv('DB_PASSWORD')}@"
     f"{os.getenv('DB_HOST')}:"
     f"{os.getenv('DB_PORT')}/"
-    f"{os.getenv('DB_NAME')}"
+    f"{os.getenv('DB_NAME')}",
+    pool_size=20,
+    max_overflow=10
 )

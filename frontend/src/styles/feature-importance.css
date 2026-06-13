@@ -1,0 +1,107 @@
+.fi-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    max-height: 300px;
+    box-sizing: border-box;
+}
+
+.fi-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 2px 0;
+}
+
+.fi-subtitle {
+    font-size: 12px;
+    color: #aaa;
+    margin: 0 0 16px 0;
+    font-weight: 500;
+}
+
+.fi-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1;
+    min-height: 0;
+}
+
+.fi-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.fi-row-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.fi-feature {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111;
+}
+
+.fi-value {
+    font-size: 12px;
+    font-weight: 700;
+    color: #555;
+}
+
+.fi-bar-track {
+    height: 6px;
+    background: #f0f0f0;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.fi-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #818cf8);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+.fi-appearances {
+    font-size: 11px;
+    color: #bbb;
+    font-weight: 500;
+}
+
+.fi-empty,
+.fi-skeleton {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #bbb;
+    font-size: 13px;
+    font-style: italic;
+}
+
+.fi-skeleton {
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-style: normal;
+    animation: fi-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes fi-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.fi-list {
+    overflow-y: auto;
+    padding-right: 4px;
+}

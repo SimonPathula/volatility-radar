@@ -1,0 +1,92 @@
+.td-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    flex: 1;
+}
+
+.td-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 16px 0;
+}
+
+.td-table {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.td-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.td-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-size: 13px;
+    padding: 6px 0;
+    border-bottom: 1px solid #f9f9f9;
+    gap: 12px;
+}
+
+.td-feature {
+    color: #111;
+    font-weight: 500;
+}
+
+.td-note {
+    color: #aaa;
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.td-impact {
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.td-impact.positive {
+    color: #22c55e;
+}
+
+.td-impact.negative {
+    color: #ef4444;
+}
+
+.td-impact.neutral {
+    color: #888;
+}
+
+.td-feature-col {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+.td-bar-track {
+    height: 4px;
+    background: #f0f0f0;
+    border-radius: 999px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.td-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}

@@ -1,38 +1,58 @@
+import joblib
 import pandas as pd
 from datetime import timedelta
-from fastapi import HTTPException
-from app.db.database import engine
+from app.db.database import engine 
+from fastapi.exceptions import HTTPException
+from app.services.prediction_service import predict_pair_past
 
-def ohlc(date:str, pair:str):
-    pair_1 = pair[:3]
-    pair_2 = pair[3:]
+MODEL = joblib.load(r"D:\projects\volatility-radar\src\models\volatility_radar_xgb.pkl")
 
-    price_query = f"""
-    SELECT *
+def get_hist_val_data(pair: str, date: str):
+
+    q = f"""
+    SELECT date
     FROM forex_prices
     WHERE pair = '{pair}'
-    AND date <= '{date}'
+    AND date < '{date}'
     ORDER BY date DESC
-    LIMIT 1
+    LIMIT 30
     """
-    df = pd.read_sql(price_query, engine)
 
-    if 'timestamp' in df.columns:
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
-        df = df.rename(columns={'timestamp': 'date'})
+    dates_df = pd.read_sql(q, engine)
 
-    df['date'] = pd.to_datetime(df['date'])
+    results = []
+
+    for target_date in dates_df["date"]:
+
+        prediction_result = predict_pair_past(
+            pair,
+            str(target_date)
+        )
+
+        correct = (
+            prediction_result["prediction"]
+            == prediction_result["actual"]
+        )
+
+        results.append(correct)
+
+    total = len(results)
+    correct_count = sum(results)
+
+    accuracy = (
+        correct_count / total * 100
+        if total > 0
+        else 0
+    )
 
     return {
-        "pair" : pair,
-        "date" : date,
-        "open" : df["open"].iloc[0],
-        "high" : df["high"].iloc[0],
-        "low" : df["low"].iloc[0],
-        "close" : df["close"].iloc[0]
+        "pair": pair,
+        "accuracy": round(accuracy, 2),
+        "correct_predictions": correct_count,
+        "total_predictions": total
     }
 
-def get_ohlc_data(pair: str, date:str):
+def get_historic_validation_data(pair:str, date:str):
     VALID_PAIRS = {
         "EURUSD",
         "GBPUSD",
@@ -63,11 +83,11 @@ def get_ohlc_data(pair: str, date:str):
             detail="Forex market closed on weekends."
         )
 
-        return ohlc(date, pair)
+        return get_hist_val_data(pair, date)
 
     elif requested_date == latest_price_date + timedelta(days=1):
 
-        result = ohlc(date, pair)
+        result = get_hist_val_data(pair, date)
 
         if requested_date.weekday() >= 5:
             result["warning"] = (
@@ -83,4 +103,3 @@ def get_ohlc_data(pair: str, date:str):
         status_code=400,
         detail="Select a historical trading day or tomorrow."
     )
-

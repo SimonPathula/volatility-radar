@@ -1,0 +1,108 @@
+.po-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px 28px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.po-primary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 160px;
+}
+
+.po-primary-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.po-primary-value {
+    font-size: 40px;
+    font-weight: 800;
+    color: #111;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.po-sample-size {
+    font-size: 12px;
+    color: #aaa;
+    font-weight: 500;
+}
+
+.po-divider {
+    width: 1px;
+    height: 56px;
+    background: #f0f0f0;
+    flex-shrink: 0;
+}
+
+.po-metrics {
+    display: flex;
+    flex: 1;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.po-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 110px;
+}
+
+.po-metric-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+}
+
+.po-metric-value {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+}
+
+.po-skeleton {
+    background: #f0f0f0;
+    border-radius: 6px;
+    animation: po-pulse 1.2s ease-in-out infinite;
+}
+
+.po-skeleton-big {
+    width: 100px;
+    height: 40px;
+}
+
+.po-skeleton-small {
+    width: 50px;
+    height: 24px;
+}
+
+@keyframes po-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+@media (max-width: 900px) {
+    .po-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    .po-divider {
+        display: none;
+    }
+    .po-metrics {
+        gap: 24px;
+        width: 100%;
+    }
+}

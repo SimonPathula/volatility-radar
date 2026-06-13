@@ -1,0 +1,152 @@
+.cm-card {
+    background: white;
+    border-radius: 20px;
+    padding: 16px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+    height: 100%;
+    max-height: 300px;
+    box-sizing: border-box;
+}
+
+.cm-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.cm-grid {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    grid-template-rows: 18px 1fr;
+    gap: 4px;
+    flex: 1;
+    min-height: 0;
+}
+
+.cm-corner {
+    grid-row: 1;
+    grid-column: 1;
+}
+
+.cm-axis-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.cm-axis-top {
+    grid-row: 1;
+    grid-column: 2;
+    text-align: center;
+}
+
+.cm-axis-left {
+    grid-row: 2;
+    grid-column: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+}
+
+.cm-table {
+    grid-row: 2;
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 0;
+    height: 100%;
+}
+
+.cm-header-row {
+    display: grid;
+    grid-template-columns: 70px repeat(3, 1fr);
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.cm-row {
+    display: grid;
+    grid-template-columns: 70px repeat(3, 1fr);
+    gap: 6px;
+    flex: 1;
+    min-height: 0;
+}
+
+.cm-header-cell {
+    font-size: 12px;
+    font-weight: 700;
+    color: #888;
+    text-align: center;
+    padding: 4px 0;
+}
+
+.cm-row-label-spacer {
+    visibility: hidden;
+}
+
+.cm-row-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    text-align: right;
+}
+
+.cm-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    border-radius: 8px;
+    transition: transform 0.15s ease;
+    min-height: 0;
+}
+
+.cm-cell:hover {
+    transform: scale(1.04);
+}
+
+.cm-insight {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    color: #92400e;
+    background: #fffbeb;
+    border: 1px solid #fef3c7;
+    border-radius: 10px;
+    padding: 8px 12px;
+    line-height: 1.4;
+    flex-shrink: 0;
+}
+
+.cm-insight-icon {
+    flex-shrink: 0;
+}
+
+.cm-skeleton {
+    height: 220px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    animation: cm-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes cm-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
