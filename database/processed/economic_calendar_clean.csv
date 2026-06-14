@@ -13717,67 +13717,7 @@ date,time,currency,event,impact,actual,previous
 2026-03-13,7:30pm,USD,JOLTS Job Openings,High,6.95M,6.55M
 2026-03-13,7:30pm,USD,Prelim UoM Consumer Sentiment,Medium,55.5,56.6
 2026-03-13,7:30pm,USD,Prelim UoM Inflation Expectations,Medium,3.4%,3.4%
-2026-03-09,5:00am,JPY,Average Cash Earnings y/y,Low,3.0%,2.4%
-2026-03-09,5:20am,JPY,Bank Lending y/y,Low,4.5%,4.4%
-2026-03-09,5:20am,JPY,Current Account,Low,3.15T,2.70T
-2026-03-09,10:30am,JPY,Leading Indicators,Low,112.4%,111.0%
-2026-03-09,11:30am,JPY,Economy Watchers Sentiment,Low,48.9,47.6
-2026-03-09,12:30pm,EUR,German Factory Orders m/m,Low,-11.1%,6.4%
-2026-03-09,12:30pm,EUR,German Industrial Production m/m,Low,-0.5%,-1.0%
-2026-03-09,3:00pm,EUR,Sentix Investor Confidence,Low,-3.1,4.2
-2026-03-10,3:00pm,JPY,Household Spending y/y,Low,-1.0%,-2.6%
-2026-03-10,5:20am,JPY,Final GDP Price Index y/y,Low,3.4%,3.4%
-2026-03-10,5:20am,JPY,Final GDP q/q,Low,0.3%,0.1%
-2026-03-10,5:20am,JPY,M2 Money Stock y/y,Low,1.7%,1.6%
-2026-03-10,5:31am,GBP,BRC Retail Sales Monitor y/y,Low,0.7%,2.3%
-2026-03-10,11:30am,JPY,Prelim Machine Tool Orders y/y,Low,24.2%,25.3%
-2026-03-10,12:30pm,EUR,German Trade Balance,Low,21.2B,17.4B
-2026-03-10,1:15pm,EUR,French Trade Balance,Low,-1.8B,-4.3B
-2026-03-10,3:30pm,USD,NFIB Small Business Index,Low,98.8,99.3
-2026-03-10,5:45pm,USD,ADP Weekly Employment Change,Low,15.5K,12.8K
-2026-03-10,7:30pm,USD,Existing Home Sales,Low,4.09M,4.02M
-2026-03-11,5:20am,JPY,PPI y/y,Low,2.0%,2.3%
-2026-03-11,12:30pm,EUR,German Final CPI m/m,Low,0.2%,0.2%
-2026-03-11,4:03pm,EUR,German 10-y Bond Auction,Low,2.89|1.2,2.73|1.5
-2026-03-11,6:00pm,USD,Core CPI m/m,High,0.2%,0.3%
 2026-03-11,6:00pm,USD,Core CPI y/y,High,2.5%,2.5%
-2026-03-11,6:00pm,USD,CPI m/m,High,0.3%,0.2%
-2026-03-11,6:00pm,USD,CPI y/y,High,2.4%,2.4%
-2026-03-11,8:00pm,USD,Crude Oil Inventories,Low,3.8M,3.5M
-2026-03-11,10:31pm,USD,10-y Bond Auction,Low,4.22|2.4,4.18|2.4
-2026-03-11,11:30pm,USD,Federal Budget Balance,Low,-307.5B,-94.6B
-2026-03-12,5:20am,JPY,BSI Manufacturing Index,Low,3.8,4.7
-2026-03-12,5:31am,GBP,RICS House Price Balance,Low,-12%,-10%
-2026-03-12,2:30pm,EUR,Italian Quarterly Unemployment Rate,Low,5.6%,6.0%
-2026-03-12,2:30pm,USD,Unemployment Claims,High,213K,214K
-2026-03-12,2:30pm,USD,Building Permits,Low,1.38M,1.45M
-2026-03-12,2:30pm,USD,Goods Trade Balance,Low,-80.8B,-98.5B
-2026-03-12,2:30pm,USD,Housing Starts,Low,1.49M,1.39M
-2026-03-12,2:30pm,USD,Trade Balance,Low,-54.5B,-72.9B
-2026-03-12,7:00pm,GBP,CB Leading Index m/m,Low,0.0%,0.0%
-2026-03-12,8:00pm,USD,Natural Gas Storage,Low,-38B,-132B
-2026-03-12,10:31pm,USD,30-y Bond Auction,Low,4.87|2.5,4.75|2.7
-2026-03-13,12:30pm,EUR,German WPI m/m,Low,0.6%,0.9%
-2026-03-13,12:30pm,GBP,GDP m/m,High,0.0%,0.1%
-2026-03-13,12:30pm,GBP,Construction Output m/m,Low,0.2%,-0.5%
-2026-03-13,12:30pm,GBP,Goods Trade Balance,Low,-14.4B,-22.7B
-2026-03-13,12:30pm,GBP,Index of Services 3m/3m,Low,0.2%,0.0%
-2026-03-13,12:30pm,GBP,Industrial Production m/m,Low,-0.1%,-0.9%
-2026-03-13,12:30pm,GBP,Manufacturing Production m/m,Low,0.1%,-0.5%
-2026-03-13,1:15pm,EUR,French Final CPI m/m,Low,0.6%,0.7%
-2026-03-13,2:30pm,EUR,Italian Industrial Production m/m,Low,-0.6%,-0.5%
-2026-03-13,3:00pm,GBP,Consumer Inflation Expectations,Low,3.2%,3.5%
-2026-03-13,3:30pm,EUR,Industrial Production m/m,Low,-1.5%,-0.5%
-2026-03-13,3:30pm,USD,Core PCE Price Index m/m,High,0.4%,0.4%
-2026-03-13,3:30pm,USD,Prelim GDP q/q,High,0.7%,1.4%
-2026-03-13,3:30pm,USD,Core Durable Goods Orders m/m,Medium,0.4%,1.0%
-2026-03-13,3:30pm,USD,Durable Goods Orders m/m,Medium,0.0%,-0.9%
-2026-03-13,3:30pm,USD,Prelim GDP Price Index q/q,Medium,3.8%,3.6%
-2026-03-13,3:30pm,USD,Personal Income m/m,Low,0.4%,0.3%
-2026-03-13,3:30pm,USD,Personal Spending m/m,Low,0.4%,0.4%
-2026-03-13,7:30pm,USD,JOLTS Job Openings,High,6.95M,6.55M
-2026-03-13,7:30pm,USD,Prelim UoM Consumer Sentiment,Medium,55.5,56.6
-2026-03-13,7:30pm,USD,Prelim UoM Inflation Expectations,Medium,3.4%,3.4%
 2026-03-16,5:24am,GBP,Rightmove HPI m/m,Low,0.8%,0.0%
 2026-03-16,5:24am,USD,Empire State Manufacturing Index,Medium,-0.2,7.1
 2026-03-16,6:45pm,USD,Capacity Utilization Rate,Low,76.3%,76.3%
@@ -14380,3 +14320,79 @@ date,time,currency,event,impact,actual,previous
 2026-06-03,1:30pm,EUR,Final Services PMI,Low,47.7,46.4
 2026-06-03,2:00pm,GBP,Final Services PMI,Low,49.3,47.9
 2026-06-03,2:30pm,EUR,PPI m/m,Low,0.6%,3.4%
+2026-06-03,5:45pm,USD,ADP Non-Farm Employment Change,High,122K,105K
+2026-06-03,7:15pm,USD,Final Services PMI,Low,50.7,50.9
+2026-06-03,7:30pm,USD,ISM Services PMI,High,54.5,53.6
+2026-06-03,7:30pm,USD,Factory Orders m/m,Low,4.8%,1.8%
+2026-06-03,8:00pm,USD,Crude Oil Inventories,Low,-8.0M,-3.3M
+2026-06-04,2:00pm,GBP,Construction PMI,Low,38.2,39.7
+2026-06-04,2:20pm,EUR,French 10-y Bond Auction,Low,3.80|2.4,3.61|2.0
+2026-06-04,2:30pm,EUR,Retail Sales m/m,Low,-0.4%,0.8%
+2026-06-04,3:00pm,USD,Challenger Job Cuts y/y,Low,3.4%,-20.9%
+2026-06-04,6:00pm,USD,Unemployment Claims,Medium,225K,212K
+2026-06-04,6:00pm,USD,Revised Nonfarm Productivity q/q,Low,0.3%,0.8%
+2026-06-04,6:00pm,USD,Revised Unit Labor Costs q/q,Low,1.8%,2.3%
+2026-06-04,8:00pm,USD,Natural Gas Storage,Low,95B,92B
+2026-06-05,5:00am,JPY,Average Cash Earnings y/y,Low,3.5%,3.1%
+2026-06-05,5:00am,JPY,Household Spending y/y,Low,-0.5%,-2.9%
+2026-06-05,10:30am,JPY,Leading Indicators,Low,115.9%,114.0%
+2026-06-05,11:30am,GBP,Halifax HPI m/m,Low,-0.1%,-0.1%
+2026-06-05,12:15pm,EUR,French Industrial Production m/m,Low,0.1%,1.4%
+2026-06-05,12:15pm,EUR,French Trade Balance,Low,-5.6B,-6.4B
+2026-06-05,2:30pm,EUR,Final Employment Change q/q,Low,0.1%,0.1%
+2026-06-05,2:30pm,EUR,Italian Retail Sales m/m,Low,0.0%,0.8%
+2026-06-05,2:30pm,EUR,Revised GDP q/q,Low,-0.2%,0.1%
+2026-06-05,2:30pm,USD,Average Hourly Earnings m/m,High,0.3%,0.2%
+2026-06-05,2:30pm,USD,Non-Farm Employment Change,High,172K,179K
+2026-06-05,2:30pm,USD,Unemployment Rate,High,4.3%,4.3%
+2026-06-06,12:30am,USD,Consumer Credit m/m,Low,20.7B,22.2B
+2026-06-08,5:20am,JPY,Bank Lending y/y,Low,5.7%,5.4%
+2026-06-08,5:20am,JPY,Current Account,Low,4.21T,3.90T
+2026-06-08,5:33am,JPY,Final GDP Price Index y/y,Low,3.2%,3.4%
+2026-06-08,5:33am,JPY,Final GDP q/q,Low,0.5%,0.5%
+2026-06-08,10:30am,JPY,Economy Watchers Sentiment,Low,43.6,40.8
+2026-06-08,11:30am,EUR,German Factory Orders m/m,Low,-3.8%,4.5%
+2026-06-08,2:00pm,EUR,Sentix Investor Confidence,Low,-13.4,-16.4
+2026-06-09,4:31am,GBP,BRC Retail Sales Monitor y/y,Low,3.4%,-3.4%
+2026-06-09,5:20am,JPY,M2 Money Stock y/y,Low,2.5%,2.3%
+2026-06-09,11:30am,EUR,German Industrial Production m/m,Low,0.4%,-0.1%
+2026-06-09,11:30am,EUR,German Trade Balance,Low,14.5B,14.7B
+2026-06-09,11:30am,JPY,Prelim Machine Tool Orders y/y,Low,37.4%,45.1%
+2026-06-09,3:30pm,USD,NFIB Small Business Index,Low,95.3,95.9
+2026-06-09,5:45pm,USD,ADP Weekly Employment Change,Low,29.0K,35.8K
+2026-06-09,5:45pm,USD,Trade Balance,Low,-55.9B,-56.6B
+2026-06-09,7:30pm,USD,Existing Home Sales,Low,4.17M,4.04M
+2026-06-09,7:30pm,USD,Final Wholesale Inventories m/m,Low,0.6%,0.5%
+2026-06-10,5:20am,JPY,PPI y/y,Low,6.3%,5.3%
+2026-06-10,9:05am,JPY,30-y Bond Auction,Low,3.86|2.9,3.84|3.5
+2026-06-10,1:30pm,EUR,Italian Industrial Production m/m,Low,0.5%,0.6%
+2026-06-10,3:05pm,EUR,German 10-y Bond Auction,Low,3.06|1.7,3.16|1.5
+2026-06-10,6:00pm,USD,Core CPI m/m,High,0.2%,0.4%
+2026-06-10,6:00pm,USD,Core CPI y/y,High,2.9%,2.8%
+2026-06-10,6:00pm,USD,CPI m/m,High,0.5%,0.6%
+2026-06-10,6:00pm,USD,CPI y/y,High,4.2%,3.8%
+2026-06-10,6:00pm,USD,Crude Oil Inventories,Low,-7.2M,-8.0M
+2026-06-10,10:31pm,USD,10-y Bond Auction,Low,4.54|2.6,4.47|2.4
+2026-06-10,11:29pm,USD,Federal Budget Balance,Low,-292.6B,215.0B
+2026-06-11,4:31am,GBP,RICS House Price Balance,Low,-35%,-35%
+2026-06-11,5:20am,JPY,BSI Manufacturing Index,Low,-1.8,3.8
+2026-06-11,5:45pm,EUR,Main Refinancing Rate,High,2.40%,2.15%
+2026-06-11,5:45pm,USD,Core PPI m/m,High,0.4%,0.7%
+2026-06-11,5:45pm,USD,PPI m/m,High,1.1%,1.1%
+2026-06-11,5:45pm,USD,Unemployment Claims,Medium,229K,225K
+2026-06-11,8:00pm,USD,Natural Gas Storage,Low,108B,95B
+2026-06-11,10:31pm,USD,30-y Bond Auction,Low,5.02|2.3,5.05|2.3
+2026-06-12,10:00am,JPY,Revised Industrial Production m/m,Low,0.5%,0.8%
+2026-06-12,11:30am,EUR,German Final CPI m/m,Low,-0.2%,-0.2%
+2026-06-12,11:30am,GBP,GDP m/m,High,-0.1%,0.3%
+2026-06-12,11:30am,GBP,Construction Output m/m,Low,0.1%,1.5%
+2026-06-12,11:30am,GBP,Goods Trade Balance,Low,-26.0B,-27.2B
+2026-06-12,11:30am,GBP,Index of Services 3m/3m,Low,0.8%,0.8%
+2026-06-12,11:30am,GBP,Industrial Production m/m,Low,0.0%,-0.2%
+2026-06-12,11:30am,GBP,Manufacturing Production m/m,Low,0.4%,1.2%
+2026-06-12,12:15pm,EUR,French Final CPI m/m,Low,0.1%,0.1%
+2026-06-12,2:00pm,EUR,Italian Quarterly Unemployment Rate,Low,5.3%,5.7%
+2026-06-12,2:00pm,GBP,Consumer Inflation Expectations,Low,4.0%,3.2%
+2026-06-12,7:00pm,GBP,CB Leading Index m/m,Low,-0.4%,-0.5%
+2026-06-12,7:30pm,USD,Prelim UoM Consumer Sentiment,Medium,48.9,44.8
+2026-06-12,7:30pm,USD,Prelim UoM Inflation Expectations,Medium,4.6%,4.8%

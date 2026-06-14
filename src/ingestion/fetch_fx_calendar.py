@@ -1,4 +1,3 @@
-from distro import version
 from random import random
 import time
 import random
@@ -118,7 +117,7 @@ def weeks_from_then_tonow(year, month, date):
 if __name__ == '__main__':
 
     driver = uc.Chrome(version_main = 148)
-    data = weeks_from_then_tonow(2026, 3, 8)
+    data = weeks_from_then_tonow(2026, 5, 31)
     driver.quit()
 
     for row in data[:5]:

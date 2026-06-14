@@ -124,24 +124,20 @@ async def analytics_overview(lookback_days: int = 180):
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(executor, get_overview, lookback_days)
  
- 
 @app.get("/analytics/confusion_matrix")
 async def analytics_confusion_matrix(lookback_days: int = 180):
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(executor, get_confusion_matrix, lookback_days)
- 
  
 @app.get("/analytics/confidence_calibration")
 async def analytics_confidence_calibration(lookback_days: int = 180):
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(executor, get_confidence_calibration, lookback_days)
  
- 
 @app.get("/analytics/accuracy_trend")
 async def analytics_accuracy_trend(lookback_days: int = 180):
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(executor, get_accuracy_trend, lookback_days)
- 
  
 @app.get("/analytics/feature_importance")
 async def analytics_feature_importance(lookback_days: int = 180):

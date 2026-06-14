@@ -3,7 +3,7 @@ import pandas as pd
 pairs = ["EURUSD", "GBPUSD", "USDJPY"]
 
 def concat_dfs(pair: str):
-    df1 = pd.read_csv(f"D:/projects/volatility-radar/data/raw/{pair}_daily.csv")
+    df1 = pd.read_csv(f"D:/projects/volatility-radar/database/processed/{pair}_daily.csv")
     df1["timestamp"] = pd.to_datetime(df1["timestamp"]).dt.date
     df1 = df1.sort_values("timestamp", ascending= True)
 

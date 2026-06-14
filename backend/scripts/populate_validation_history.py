@@ -79,6 +79,82 @@ def upsert_records(records):
                 (r["pair"], r["date"], r["prediction"], r["actual"], r["confidence"], r["top_drivers"])
             )
 
+def update_validation_history():
+
+    create_table()
+
+    for pair in VALID_PAIRS:
+
+        q = f"""
+        SELECT MAX(date) AS dt
+        FROM model_validation_history
+        WHERE pair = '{pair}'
+        """
+
+        latest_val_date = pd.read_sql(
+            q,
+            engine
+        ).iloc[0]["dt"]
+
+        if pd.isna(latest_val_date):
+
+            records = collect_predictions(
+                pair,
+                LOOKBACK_DAYS
+            )
+
+            upsert_records(records)
+
+            continue
+
+        price_dates = pd.read_sql(
+            f"""
+            SELECT date
+            FROM forex_prices
+            WHERE pair = '{pair}'
+            AND date > '{latest_val_date}'
+            ORDER BY date
+            """,
+            engine
+        )
+
+        records = []
+
+        for target_date in price_dates["date"]:
+
+            try:
+
+                result = predict_pair_past(
+                    pair,
+                    str(target_date)
+                )
+
+                if result["actual"] is None:
+                    continue
+
+                records.append({
+                    "pair": pair,
+                    "date": str(target_date),
+                    "prediction": result["prediction"],
+                    "actual": result["actual"],
+                    "confidence": result["confidence"],
+                    "top_drivers": json.dumps(
+                        result.get(
+                            "top_drivers",
+                            []
+                        )
+                    )
+                })
+
+            except Exception as e:
+
+                print(
+                    f"skip {pair} "
+                    f"{target_date}: {e}"
+                )
+
+        upsert_records(records)
+
 
 def main():
     print("Creating table if not exists...")

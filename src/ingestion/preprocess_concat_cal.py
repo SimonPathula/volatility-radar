@@ -23,13 +23,16 @@ def preprocess_calendar(df):
 def concat_calendars(df1, df2):
 
     df2 = preprocess_calendar(df2)
+
+    df1["date"] = pd.to_datetime(df1["date"]).dt.date
     df2["date"] = pd.to_datetime(df2["date"]).dt.date
 
     df = pd.concat([df1, df2], ignore_index= True)
+    df = df.drop_duplicates()
 
     return df
 
-df1 = pd.read_csv("D:/projects/volatility-radar/data/processed/economic_calendar_clean.csv")
+df1 = pd.read_csv("D:/projects/volatility-radar/database/processed/economic_calendar_clean.csv")
 
 df2 = pd.read_csv("D:/projects/volatility-radar/database/raw/economic_calendar_raw.csv")
 
