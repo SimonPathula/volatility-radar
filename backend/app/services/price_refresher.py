@@ -8,6 +8,7 @@ Used by:
 """
 
 import os
+import time
 import logging
 import requests
 import pandas as pd
@@ -131,6 +132,7 @@ def refresh_prices_for_range(from_date: date, to_date: date):
             log.info(f"{pair}: {len(df)} rows in range {from_date} → {to_date}")
         except Exception as e:
             log.error(f"Failed to refresh {pair}: {e}")
+        time.sleep(15)
 
 
 def ensure_today_candle():
