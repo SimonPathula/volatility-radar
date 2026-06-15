@@ -71,6 +71,7 @@ def _fetch_av_prices(from_symbol: str, to_symbol: str) -> pd.DataFrame:
         raise ValueError(f"AV API error for {from_symbol}{to_symbol}: {r.text[:300]}")
 
     df = pd.read_csv(StringIO(r.text))
+    log.info(f"AV columns for {from_symbol}{to_symbol}: {df.columns.tolist()}")
     df = df.rename(columns={"timestamp": "date"})
     df["date"] = pd.to_datetime(df["date"]).dt.date
 
