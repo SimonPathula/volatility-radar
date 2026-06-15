@@ -1,12 +1,11 @@
 import pandas as pd
-from datetime import timedelta
+from datetime import date as today_fn, timedelta
 from fastapi import HTTPException
 from app.db.database import engine
+from app.services.price_refresher import ensure_today_candle
 
-def ohlc(date:str, pair:str):
-    pair_1 = pair[:3]
-    pair_2 = pair[3:]
 
+def ohlc(date: str, pair: str):
     price_query = f"""
     SELECT *
     FROM forex_prices
@@ -24,63 +23,52 @@ def ohlc(date:str, pair:str):
     df['date'] = pd.to_datetime(df['date'])
 
     return {
-        "pair" : pair,
-        "date" : date,
-        "open" : df["open"].iloc[0],
-        "high" : df["high"].iloc[0],
-        "low" : df["low"].iloc[0],
-        "close" : df["close"].iloc[0]
+        "pair":  pair,
+        "date":  date,
+        "open":  df["open"].iloc[0],
+        "high":  df["high"].iloc[0],
+        "low":   df["low"].iloc[0],
+        "close": df["close"].iloc[0],
     }
 
-def get_ohlc_data(pair: str, date:str):
-    VALID_PAIRS = {
-        "EURUSD",
-        "GBPUSD",
-        "USDJPY"
-    }
-    
+
+def get_ohlc_data(pair: str, date: str):
+    VALID_PAIRS = {"EURUSD", "GBPUSD", "USDJPY"}
+
     if pair not in VALID_PAIRS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unsupported pair: {pair}"
-        )
+        raise HTTPException(status_code=400, detail=f"Unsupported pair: {pair}")
 
     requested_date = pd.to_datetime(date).date()
-    latest_price_date = pd.read_sql(
-        "SELECT MAX(date) AS dt FROM forex_prices",
-        engine
-    ).iloc[0]["dt"]
- 
-    latest_price_date = pd.to_datetime(
-        latest_price_date
-    ).date()
+    today = today_fn.today()
+    tomorrow = today + timedelta(days=1)
 
-    if requested_date < latest_price_date:
-
+    # Past
+    if requested_date < today:
         if requested_date.weekday() >= 5:
-            raise HTTPException(
-            status_code=400,
-            detail="Forex market closed on weekends."
-        )
-
+            raise HTTPException(status_code=400, detail="Forex market closed on weekends.")
         return ohlc(date, pair)
 
-    elif requested_date == latest_price_date + timedelta(days=1):
+    # Today
+    elif requested_date == today:
+        try:
+            ensure_today_candle()
+        except Exception:
+            pass
+        return ohlc(date, pair)
 
+    # Tomorrow
+    elif requested_date == tomorrow:
+        try:
+            ensure_today_candle()
+        except Exception:
+            pass
         result = ohlc(date, pair)
-
         if requested_date.weekday() >= 5:
             result["warning"] = (
                 "Forex markets will be closed tomorrow. "
-                "Market reopen gaps and abnormal price "
-                "behavior may occur."
+                "Market reopen gaps and abnormal price behavior may occur."
             )
-
         return result
 
     else:
-        raise HTTPException(
-        status_code=400,
-        detail="Select a historical trading day or tomorrow."
-    )
-
+        raise HTTPException(status_code=400, detail="Select a historical trading day or tomorrow.")

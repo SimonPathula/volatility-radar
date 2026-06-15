@@ -14,8 +14,8 @@ def _load_records(lookback_days: int = 180):
     q = f"""
     SELECT pair, date, prediction, actual, confidence, top_drivers
     FROM model_validation_history
+    WHERE date >= DATE_SUB(CURDATE(), INTERVAL {lookback_days} DAY)
     ORDER BY date DESC
-    LIMIT {lookback_days * 3}
     """
     df = pd.read_sql(q, engine)
 

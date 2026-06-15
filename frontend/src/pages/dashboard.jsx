@@ -32,6 +32,7 @@ function Dashboard() {
     const [events, setEvents] = useState(null)
     const [priceHistory, setPriceHistory] = useState(null)
     const [chartDate, setChartDate] = useState(null)
+    const [warning, setWarning] = useState(null)
 
     const predictionRequestId = useRef(0)
 
@@ -47,6 +48,7 @@ function Dashboard() {
         setLoading(true)
         setValidationLoading(true)
         setError(null)
+        setWarning(null)
         setEvents(null)
         setValidation(null)
         setResult(null)
@@ -63,6 +65,7 @@ function Dashboard() {
 
             setResult(predData)
             setChartDate(date)
+            if (predData.warning) setWarning(predData.warning)
         } catch (err) {
             if (requestId !== predictionRequestId.current) return
 
@@ -138,6 +141,13 @@ function Dashboard() {
                     <div className="error-strip">
                         <span>⚠</span>
                         <span>{error}</span>
+                    </div>
+                )}
+
+                {warning && (
+                    <div className="warning-strip">
+                        <span>⚠</span>
+                        <span>{warning}</span>
                     </div>
                 )}
 

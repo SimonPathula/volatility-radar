@@ -34,11 +34,6 @@ PAIR_SYMBOLS = {
 # ── One-time migration (safe to call repeatedly) ──────────────────────────────
 
 def ensure_unique_constraint():
-    """
-    Adds UNIQUE KEY on (pair, date) to forex_prices if it doesn't exist.
-    Required for ON DUPLICATE KEY UPDATE upserts.
-    Call this once — idempotent.
-    """
     check_sql = """
         SELECT COUNT(*) AS cnt
         FROM information_schema.statistics
@@ -49,6 +44,15 @@ def ensure_unique_constraint():
     with engine.begin() as conn:
         row = conn.execute(text(check_sql)).fetchone()
         if row[0] == 0:
+            # Deduplicate first — keep lowest id per (pair, date)
+            conn.execute(text("""
+                DELETE fp1 FROM forex_prices fp1
+                INNER JOIN forex_prices fp2
+                  ON fp1.pair = fp2.pair
+                 AND fp1.date = fp2.date
+                 AND fp1.id > fp2.id
+            """))
+            log.info("Deduplicated forex_prices")
             conn.execute(text(
                 "ALTER TABLE forex_prices "
                 "ADD UNIQUE KEY uniq_pair_date (pair, date)"
