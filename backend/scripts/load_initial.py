@@ -11,44 +11,36 @@ PRICE_FILES = [
     (r"D:\projects\volatility-radar\database\processed\USDJPY_daily.csv", "USDJPY"),
 ]
 
-
 def load_prices():
-
-    with engine.begin() as conn:
-        conn.execute(text("TRUNCATE TABLE forex_prices"))
-
     for file_path, pair in PRICE_FILES:
-
         df = pd.read_csv(file_path)
-
         df["timestamp"] = pd.to_datetime(df["timestamp"])
-
         df = df.rename(columns={"timestamp": "date"})
-
         df["date"] = df["date"].dt.date
-
         df["pair"] = pair
+        df = df[["date", "pair", "open", "high", "low", "close"]]
 
-        df = df[
-            [
-                "date",
-                "pair",
-                "open",
-                "high",
-                "low",
-                "close",
-            ]
-        ]
+        # Upsert row by row to handle duplicates
+        with engine.begin() as conn:
+            for _, row in df.iterrows():
+                conn.execute(text("""
+                    INSERT INTO forex_prices (date, pair, open, high, low, close)
+                    VALUES (:date, :pair, :open, :high, :low, :close)
+                    ON CONFLICT (pair, date) DO UPDATE SET
+                        open = EXCLUDED.open,
+                        high = EXCLUDED.high,
+                        low = EXCLUDED.low,
+                        close = EXCLUDED.close
+                """), {
+                    "date": str(row["date"]),
+                    "pair": row["pair"],
+                    "open": float(row["open"]),
+                    "high": float(row["high"]),
+                    "low": float(row["low"]),
+                    "close": float(row["close"]),
+                })
 
-        df.to_sql(
-            "forex_prices",
-            engine,
-            if_exists="append",
-            index=False,
-            chunksize=1000,
-        )
-
-        print(f"{pair}: {len(df)} rows")
+        print(f"{pair}: {len(df)} rows upserted")
 
 
 def load_calendar():
@@ -84,7 +76,7 @@ def load_calendar():
     df.to_sql(
         "calendar_events",
         engine,
-        if_exists="append",
+        if_exists="replace",
         index=False,
         chunksize=1000,
     )
