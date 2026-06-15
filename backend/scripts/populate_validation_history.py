@@ -5,6 +5,8 @@ from pathlib import Path
 from app.db.database import engine
 from sqlalchemy import text
 from app.services.prediction_service import predict_pair_past
+import logging
+log = logging.getLogger(__name__)
 
 MODEL_PATH = (
     Path(__file__).resolve().parents[1]/"models"/"volatility_radar_xgb.pkl"
@@ -43,8 +45,11 @@ def collect_predictions(pair: str, lookback_days: int = LOOKBACK_DAYS):
     dates_df = pd.read_sql(q, engine)
 
     records = []
-    for target_date in dates_df["date"]:
+    total = len(dates_df)
+    for i, target_date in enumerate(dates_df["date"], 1):
         try:
+            if i % 10 == 0 or i == 1:
+                log.info(f"{pair}: {i}/{total} ({round(i/total*100)}%)")
             result = predict_pair_past(pair, str(target_date))
         except Exception as e:
             print(f"  skip {pair} {target_date}: {e}")
@@ -129,9 +134,12 @@ def update_validation_history():
 
         records = []
 
-        for target_date in price_dates["date"]:
+        total_dates = len(price_dates)
+        for i, target_date in enumerate(price_dates["date"], 1):
 
             try:
+                if i % 10 == 0 or i == 1:
+                    log.info(f"{pair}: processing {i}/{total_dates} ({round(i/total_dates*100)}%)")
 
                 result = predict_pair_past(
                     pair,
