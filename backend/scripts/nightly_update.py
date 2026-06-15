@@ -117,8 +117,25 @@ def _refresh_calendar():
     def scrape_day(driver, day_str: str) -> list[dict]:
         url = f"https://www.forexfactory.com/calendar?day={day_str}"
         driver.get(url)
-        wait = WebDriverWait(driver, 30)
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "calendar__row")))
+        time.sleep(5)
+        try:
+            from selenium.webdriver.common.by import By
+            cookie_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Accept')]")
+            cookie_btn.click()
+            time.sleep(2)
+        except:
+            pass
+        if "Access Denied" in driver.title or "Just a moment" in driver.title:
+            log.error(f"Forex Factory blocked the request. Page title: {driver.title}")
+            return []
+
+        wait = WebDriverWait(driver, 60)  # increased from 30 to 60
+        try:
+            wait.until(EC.presence_of_element_located((By.CLASS_NAME, "calendar__row")))
+        except:
+            log.error(f"Timed out waiting for calendar. Page title: {driver.title}")
+            log.error(f"Page source snippet: {driver.page_source[:500]}")
+            return []
 
         for i in range(1, 20):
             driver.execute_script(f"window.scrollTo(0, {i * 250});")
