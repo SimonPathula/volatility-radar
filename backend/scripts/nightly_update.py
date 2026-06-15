@@ -95,55 +95,38 @@ def run():
 
 
 def _refresh_calendar():
-    
     """
-    Scrapes current week from Forex Factory and upserts into calendar_events.
-    Reuses your existing scraping + preprocessing logic.
+    Fetches Forex Factory calendar via ScraperAPI (no Chrome needed).
+    ScraperAPI handles JS rendering on their end.
     """
-    import time
-    import random
+    import os
+    import requests
     import pandas as pd
-    from datetime import datetime
     from sqlalchemy import text
     from bs4 import BeautifulSoup
-    import undetected_chromedriver as uc
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
     from app.db.database import engine
 
+    SCRAPER_API_KEY = os.getenv("SCRAPER_API_KEY")
     TARGET_CURRENCIES = ["EUR", "USD", "GBP", "JPY"]
 
-    def scrape_day(driver, day_str: str) -> list[dict]:
-        url = f"https://www.forexfactory.com/calendar?day={day_str}"
-        driver.get(url)
-        time.sleep(5)
-        try:
-            from selenium.webdriver.common.by import By
-            cookie_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Accept')]")
-            cookie_btn.click()
-            time.sleep(2)
-        except:
-            pass
-        if "Access Denied" in driver.title or "Just a moment" in driver.title:
-            log.error(f"Forex Factory blocked the request. Page title: {driver.title}")
-            return []
+    def fetch_html(day_str: str) -> str:
+        target_url = f"https://www.forexfactory.com/calendar?day={day_str}"
+        response = requests.get(
+            "http://api.scraperapi.com",
+            params={
+                "api_key": SCRAPER_API_KEY,
+                "url": target_url,
+                "render": "true",
+            },
+            timeout=120,
+        )
+        response.raise_for_status()
+        return response.text
 
-        wait = WebDriverWait(driver, 60)  # increased from 30 to 60
-        try:
-            wait.until(EC.presence_of_element_located((By.CLASS_NAME, "calendar__row")))
-        except:
-            log.error(f"Timed out waiting for calendar. Page title: {driver.title}")
-            log.error(f"Page source snippet: {driver.page_source[:500]}")
-            return []
-
-        for i in range(1, 20):
-            driver.execute_script(f"window.scrollTo(0, {i * 250});")
-            time.sleep(0.3)
-        time.sleep(1)
-
-        soup = BeautifulSoup(driver.page_source, "html.parser")
+    def parse_html(html: str) -> list[dict]:
+        soup = BeautifulSoup(html, "html.parser")
         rows = soup.find_all("tr", class_="calendar__row")
+
         result = []
         current_date = None
 
@@ -177,21 +160,21 @@ def _refresh_calendar():
                 img = impact_cell.find("img")
                 if img:
                     src = img.get("src", "")
-                    if   'gra' in src: 
+                    if   "gra" in src:
                         impact_text = "Non-Economic"
-                    elif 'yel' in src: 
+                    elif "yel" in src:
                         impact_text = "Low"
-                    elif 'ora' in src: 
+                    elif "ora" in src:
                         impact_text = "Medium"
-                    elif "red" in src: 
+                    elif "red" in src:
                         impact_text = "High"
 
-            time_cell = row.find("td", class_="calendar__time")
+            time_cell  = row.find("td", class_="calendar__time")
             event_cell = row.find("td", class_="calendar__event")
 
             result.append({
                 "date":     current_date,
-                "time":     time_cell.get_text(strip=True) if time_cell else "",
+                "time":     time_cell.get_text(strip=True)  if time_cell  else "",
                 "currency": currency,
                 "event":    event_cell.get_text(strip=True) if event_cell else "",
                 "impact":   impact_text,
@@ -204,13 +187,11 @@ def _refresh_calendar():
 
     def preprocess(rows: list[dict]) -> pd.DataFrame:
         import calendar as cal_mod
-        import re
 
         df = pd.DataFrame(rows)
         if df.empty:
             return df
 
-        # Parse date strings like "Sun Jun 14"
         parts = df["date"].str.split(" ", expand=True)
         month_map = {m: i for i, m in enumerate(cal_mod.month_abbr) if m}
         df["month_num"] = parts[1].map(month_map)
@@ -218,7 +199,6 @@ def _refresh_calendar():
 
         today = date.today()
         df["year"] = today.year
-        # Handle year rollover (December → January)
         df.loc[df["month_num"] < today.month - 1, "year"] = today.year + 1
 
         df["date"] = pd.to_datetime(
@@ -246,12 +226,11 @@ def _refresh_calendar():
 
             ON CONFLICT (date, time, currency, event)
             DO UPDATE SET
-                actual = EXCLUDED.actual,
+                actual   = EXCLUDED.actual,
                 previous = EXCLUDED.previous,
-                impact = EXCLUDED.impact
+                impact   = EXCLUDED.impact
         """)
 
-        # Ensure unique key exists on calendar_events too
         with engine.begin() as conn:
             conn.execute(text("""
                 CREATE UNIQUE INDEX IF NOT EXISTS
@@ -259,31 +238,29 @@ def _refresh_calendar():
                 ON calendar_events
                 (date, time, currency, event)
             """))
-            log.info("Added UNIQUE KEY uniq_cal_row to calendar_events")
 
         records = df.to_dict(orient="records")
         with engine.begin() as conn:
             conn.execute(sql, records)
         log.info(f"Calendar: upserted {len(records)} rows")
 
-    # Forex Factory posts next week's events in advance — needed for "tomorrow" predictions
+    # ── Main ──────────────────────────────────────────────────────────────────
     today = date.today()
     day_str = today.strftime("%b%-d.%Y").lower()
-    log.info(f"Scraping Forex Factory day: {day_str}")
+    log.info(f"Fetching Forex Factory via ScraperAPI: {day_str}")
 
-    options = uc.ChromeOptions()
-    options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")
-    driver = uc.Chrome(options=options)
-    try:
-        rows = scrape_day(driver, day_str)
-    finally:
-        driver.quit()
+    html = fetch_html(day_str)
+
+    # Sanity check — if we got blocked, HTML won't have calendar rows
+    if "calendar__row" not in html:
+        log.error(f"No calendar rows in response. Possible block. Snippet: {html[:300]}")
+        return
+
+    rows = parse_html(html)
+    log.info(f"Parsed {len(rows)} raw rows")
 
     df = preprocess(rows)
-    log.info(f"Calendar: {len(df)} rows scraped after preprocessing")
+    log.info(f"Calendar: {len(df)} rows after preprocessing")
     upsert_calendar(df)
 
 if __name__ == "__main__":
