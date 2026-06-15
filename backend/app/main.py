@@ -222,7 +222,7 @@ async def get_prices(pair: str, from_date: str = None, days: int = 90):
     SELECT "date", "open", "high", "low", "close"
     FROM forex_prices
     WHERE pair = '{pair}'
-    AND "date" >= DATE_SUB('{from_date}', INTERVAL {days} DAY)
+    AND "date" >= '{from_date}'::date - INTERVAL '{days} days'
     ORDER BY "date" ASC
     """
     loop = asyncio.get_event_loop()
