@@ -18,6 +18,7 @@ import joblib
 import pandas as pd
 from datetime import date, timedelta
 from fastapi import HTTPException
+from pathlib import Path
 from app.db.database import engine
 from app.services.prediction_core import build_prediction_features
 from app.services.shap_explaination import get_top_shap_features
@@ -28,7 +29,11 @@ from app.services.price_refresher import (
     get_latest_db_date,
 )
 
-MODEL = joblib.load(r"D:\projects\volatility-radar\src\models\volatility_radar_xgb.pkl")
+MODEL_PATH = (
+    Path(__file__).resolve().parents[2]/"models"/"volatility_radar_xgb.pkl"
+)
+
+MODEL = joblib.load(MODEL_PATH)
 
 VALID_PAIRS = {"EURUSD", "GBPUSD", "USDJPY"}
 

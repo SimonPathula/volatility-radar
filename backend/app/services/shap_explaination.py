@@ -1,8 +1,14 @@
 import shap
 import joblib
 import numpy as np
+from pathlib import Path
 
-MODEL = joblib.load(r"D:\projects\volatility-radar\src\models\volatility_radar_xgb.pkl")
+MODEL_PATH = (
+    Path(__file__).resolve().parents[2]/"models"/"volatility_radar_xgb.pkl"
+)
+
+MODEL = joblib.load(MODEL_PATH)
+
 EXPLAINER = shap.TreeExplainer(MODEL)
 
 def get_top_shap_features(X, predicted_label, top_n=5):

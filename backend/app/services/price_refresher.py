@@ -34,32 +34,17 @@ PAIR_SYMBOLS = {
 # ── One-time migration (safe to call repeatedly) ──────────────────────────────
 
 def ensure_unique_constraint():
-    check_sql = """
-        SELECT COUNT(*) AS cnt
-        FROM information_schema.statistics
-        WHERE table_schema = DATABASE()
-          AND table_name = 'forex_prices'
-          AND index_name = 'uniq_pair_date'
-    """
     with engine.begin() as conn:
-        row = conn.execute(text(check_sql)).fetchone()
-        if row[0] == 0:
-            # Deduplicate first — keep lowest id per (pair, date)
-            conn.execute(text("""
-                DELETE fp1 FROM forex_prices fp1
-                INNER JOIN forex_prices fp2
-                  ON fp1.pair = fp2.pair
-                 AND fp1.date = fp2.date
-                 AND fp1.id > fp2.id
-            """))
-            log.info("Deduplicated forex_prices")
-            conn.execute(text(
-                "ALTER TABLE forex_prices "
-                "ADD UNIQUE KEY uniq_pair_date (pair, date)"
-            ))
-            log.info("Added UNIQUE KEY uniq_pair_date to forex_prices")
-        else:
-            log.debug("UNIQUE KEY uniq_pair_date already exists")
+
+        conn.execute(text("""
+            CREATE UNIQUE INDEX IF NOT EXISTS
+            uniq_pair_date
+            ON forex_prices(pair, date)
+        """))
+
+    log.info(
+        "Ensured unique index uniq_pair_date"
+    )
 
 
 # ── Core fetch ────────────────────────────────────────────────────────────────
@@ -95,21 +80,21 @@ def _fetch_av_prices(from_symbol: str, to_symbol: str) -> pd.DataFrame:
 # ── Upsert ────────────────────────────────────────────────────────────────────
 
 def _upsert_prices(pair: str, df: pd.DataFrame):
-    """
-    Upserts rows into forex_prices using ON DUPLICATE KEY UPDATE.
-    Requires UNIQUE KEY on (pair, date).
-    """
     if df.empty:
         return
 
     sql = text("""
-        INSERT INTO forex_prices (date, pair, open, high, low, close)
-        VALUES (:date, :pair, :open, :high, :low, :close)
-        ON DUPLICATE KEY UPDATE
-            open  = VALUES(open),
-            high  = VALUES(high),
-            low   = VALUES(low),
-            close = VALUES(close)
+        INSERT INTO forex_prices
+        (date, pair, open, high, low, close)
+        VALUES
+        (:date, :pair, :open, :high, :low, :close)
+
+        ON CONFLICT (pair, date)
+        DO UPDATE SET
+            open = EXCLUDED.open,
+            high = EXCLUDED.high,
+            low = EXCLUDED.low,
+            close = EXCLUDED.close
     """)
 
     records = [

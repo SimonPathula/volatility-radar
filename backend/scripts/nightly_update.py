@@ -1,5 +1,5 @@
 """
-app/scripts/nightly_update.py
+scripts/nightly_update.py
 
 Render Cron Job entry point.
 Schedule: 10:00 PM UTC daily  =  3:30 AM IST
@@ -12,7 +12,7 @@ What it does:
   4. Logs a summary
 
 Render Cron Job config:
-  Command : python -m app.scripts.nightly_update
+  Command : python -m scripts.nightly_update
   Schedule: 0 22 * * *   (10 PM UTC = 3:30 AM IST)
 """
 
@@ -222,29 +222,27 @@ def _refresh_calendar():
             return
 
         sql = text("""
-            INSERT INTO calendar_events (date, time, currency, event, impact, actual, previous)
-            VALUES (:date, :time, :currency, :event, :impact, :actual, :previous)
-            ON DUPLICATE KEY UPDATE
-                actual   = VALUES(actual),
-                previous = VALUES(previous),
-                impact   = VALUES(impact)
+            INSERT INTO calendar_events
+            (date, time, currency, event, impact, actual, previous)
+            VALUES
+            (:date, :time, :currency, :event, :impact, :actual, :previous)
+
+            ON CONFLICT (date, time, currency, event)
+            DO UPDATE SET
+                actual = EXCLUDED.actual,
+                previous = EXCLUDED.previous,
+                impact = EXCLUDED.impact
         """)
 
         # Ensure unique key exists on calendar_events too
-        check = """
-            SELECT COUNT(*) FROM information_schema.statistics
-            WHERE table_schema = DATABASE()
-              AND table_name = 'calendar_events'
-              AND index_name = 'uniq_cal_row'
-        """
         with engine.begin() as conn:
-            cnt = conn.execute(text(check)).fetchone()[0]
-            if cnt == 0:
-                conn.execute(text(
-                    "ALTER TABLE calendar_events "
-                    "ADD UNIQUE KEY uniq_cal_row (date, time, currency, event)"
-                ))
-                log.info("Added UNIQUE KEY uniq_cal_row to calendar_events")
+            conn.execute(text("""
+                CREATE UNIQUE INDEX IF NOT EXISTS
+                uniq_cal_row
+                ON calendar_events
+                (date, time, currency, event)
+            """))
+            log.info("Added UNIQUE KEY uniq_cal_row to calendar_events")
 
         records = df.to_dict(orient="records")
         with engine.begin() as conn:
@@ -256,7 +254,12 @@ def _refresh_calendar():
     day_str = today.strftime("%b%-d.%Y").lower()
     log.info(f"Scraping Forex Factory day: {day_str}")
 
-    driver = uc.Chrome(version_main=148)
+    options = uc.ChromeOptions()
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    driver = uc.Chrome(options=options)
     try:
         rows = scrape_day(driver, day_str)
     finally:

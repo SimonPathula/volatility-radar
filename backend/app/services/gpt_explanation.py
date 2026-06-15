@@ -6,6 +6,7 @@ import joblib
 import pandas as pd
 from datetime import timedelta
 from app.db.database import engine
+from pathlib import Path
 from datetime import date as date_today_fn, timedelta
 from app.services.prediction_core import build_prediction_features
 from app.services.shap_explaination import get_top_shap_features
@@ -15,7 +16,11 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 PAIR_MAP = {0: 'EURUSD', 1: 'GBPUSD', 2: 'USDJPY'}
 LABEL_MAP = {0: 'Bearish', 1: 'Neutral', 2: 'Bullish'}
-MODEL = joblib.load(r"D:\projects\volatility-radar\src\models\volatility_radar_xgb.pkl")
+MODEL_PATH = (
+    Path(__file__).resolve().parents[2]/"models"/"volatility_radar_xgb.pkl"
+)
+
+MODEL = joblib.load(MODEL_PATH)
 FEATURE_NAMES = MODEL.feature_names_in_
 
 

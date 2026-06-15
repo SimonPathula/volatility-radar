@@ -205,11 +205,11 @@ async def get_prices(pair: str, from_date: str = None, days: int = 90):
         raise HTTPException(status_code=400, detail=f"Unsupported pair: {pair}")
 
     q = f"""
-    SELECT `date`, `open`, `high`, `low`, `close`
+    SELECT "date", "open", "high", "low", "close"
     FROM forex_prices
     WHERE pair = '{pair}'
-    AND `date` >= DATE_SUB('{from_date}', INTERVAL {days} DAY)
-    ORDER BY `date` ASC
+    AND "date" >= DATE_SUB('{from_date}', INTERVAL {days} DAY)
+    ORDER BY "date" ASC
     """
     loop = asyncio.get_event_loop()
     df = await loop.run_in_executor(executor, pd.read_sql, q, engine)

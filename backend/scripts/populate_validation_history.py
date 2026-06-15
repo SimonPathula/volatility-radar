@@ -1,10 +1,16 @@
 import joblib
 import pandas as pd
 import json
+from pathlib import Path
 from app.db.database import engine
+from sqlalchemy import text
 from app.services.prediction_service import predict_pair_past
 
-MODEL = joblib.load(r"D:\projects\volatility-radar\src\models\volatility_radar_xgb.pkl")
+MODEL_PATH = (
+    Path(__file__).resolve().parents[1]/"models"/"volatility_radar_xgb.pkl"
+)
+
+MODEL = joblib.load(MODEL_PATH)
 
 VALID_PAIRS = ["EURUSD", "GBPUSD", "USDJPY"]
 LOOKBACK_DAYS = 180
@@ -14,14 +20,14 @@ def create_table():
     with engine.begin() as conn:
         conn.exec_driver_sql("""
             CREATE TABLE IF NOT EXISTS model_validation_history (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
                 pair VARCHAR(10) NOT NULL,
                 date DATE NOT NULL,
                 prediction VARCHAR(10) NOT NULL,
                 actual VARCHAR(10) NOT NULL,
                 confidence FLOAT NOT NULL,
                 top_drivers JSON,
-                UNIQUE KEY uniq_pair_date (pair, date)
+                CONSTRAINT uniq_pair_date UNIQUE (pair, date)
             )
         """)
 
@@ -65,18 +71,21 @@ def upsert_records(records):
 
     with engine.begin() as conn:
         for r in records:
-            conn.exec_driver_sql(
-                """
-                INSERT INTO model_validation_history
+            conn.execute(
+                text("""
+                    INSERT INTO model_validation_history
                     (pair, date, prediction, actual, confidence, top_drivers)
-                VALUES (%s, %s, %s, %s, %s, %s)
-                ON DUPLICATE KEY UPDATE
-                    prediction = VALUES(prediction),
-                    actual = VALUES(actual),
-                    confidence = VALUES(confidence),
-                    top_drivers = VALUES(top_drivers)
-                """,
-                (r["pair"], r["date"], r["prediction"], r["actual"], r["confidence"], r["top_drivers"])
+                    VALUES
+                    (:pair, :date, :prediction, :actual, :confidence, :top_drivers)
+
+                    ON CONFLICT (pair, date)
+                    DO UPDATE SET
+                        prediction = EXCLUDED.prediction,
+                        actual = EXCLUDED.actual,
+                        confidence = EXCLUDED.confidence,
+                        top_drivers = EXCLUDED.top_drivers
+                """),
+                r
             )
 
 def update_validation_history():
