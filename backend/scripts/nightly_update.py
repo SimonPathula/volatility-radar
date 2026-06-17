@@ -110,18 +110,28 @@ def _refresh_calendar():
     TARGET_CURRENCIES = ["EUR", "USD", "GBP", "JPY"]
 
     def fetch_html(day_str: str) -> str:
+        import time
         target_url = f"https://www.forexfactory.com/calendar?day={day_str}"
-        response = requests.get(
-            "http://api.scraperapi.com",
-            params={
-                "api_key": SCRAPER_API_KEY,
-                "url": target_url,
-                "render": "true",
-            },
-            timeout=120,
-        )
-        response.raise_for_status()
-        return response.text
+        
+        for attempt in range(3):  # retry up to 3 times
+            try:
+                response = requests.get(
+                    "http://api.scraperapi.com",
+                    params={
+                        "api_key": SCRAPER_API_KEY,
+                        "url": target_url,
+                        "render": "true",
+                    },
+                    timeout=120,
+                )
+                response.raise_for_status()
+                return response.text
+            except Exception as e:
+                log.warning(f"ScraperAPI attempt {attempt+1} failed: {e}")
+                if attempt < 2:
+                    time.sleep(30)  # wait 30s before retry
+        
+        raise Exception("ScraperAPI failed after 3 attempts")
 
     def parse_html(html: str) -> list[dict]:
         soup = BeautifulSoup(html, "html.parser")
@@ -246,7 +256,8 @@ def _refresh_calendar():
 
     # ── Main ──────────────────────────────────────────────────────────────────
     today = date.today()
-    day_str = today.strftime("%b%-d.%Y").lower()
+    ist_today = today + timedelta(days=1)
+    day_str = ist_today.strftime("%b%-d.%Y").lower()
     log.info(f"Fetching Forex Factory via ScraperAPI: {day_str}")
 
     html = fetch_html(day_str)
