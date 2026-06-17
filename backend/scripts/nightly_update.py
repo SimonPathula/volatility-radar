@@ -254,7 +254,7 @@ def _refresh_calendar():
             conn.execute(sql, records)
         log.info(f"Calendar: upserted {len(records)} rows")
 
-    # ── Main ──────────────────────────────────────────────────────────────────
+    # Main 
     today = date.today()
     ist_today = today + timedelta(days=1)
     day_str = ist_today.strftime("%b%-d.%Y").lower()
