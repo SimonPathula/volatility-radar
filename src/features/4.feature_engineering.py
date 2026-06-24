@@ -9,4 +9,4 @@ df = pd.read_csv("data/processed_v2/merged.csv")
 pair_map = {'EURUSD': 0, 'GBPUSD': 1, 'USDJPY': 2}
 df['pair'] = df['pair'].map(pair_map)
 
-df.to_csv("data/final_cleaned_data/full_features.csv", index=False)
+df.to_csv("data/final_cleaned_data/full_features_v2.csv", index=False)

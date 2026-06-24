@@ -49,7 +49,7 @@ def build_currency_features(pair):
             return np.nan
         
         move = row['next_return']
-        t1 = 0.35 * row['rolling_std_20']
+        t1 = 0.50 * row['rolling_std_20']
 
         if move > t1:
             return 2   # bullish
